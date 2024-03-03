@@ -7,7 +7,7 @@
 #include <string>
 
 #define ALPHABET_CHARS        26
-#define MAX_WORD_LENGTH     100
+#define MAX_WORD_LENGTH       100
 
 
 class TrieNode {
