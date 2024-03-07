@@ -28,7 +28,7 @@ int Stack::getLimit() {
     return _maxItems;
 }
 
-void Stack::print() const// Overload the << operator as a friend function
+void Stack::print() const
 {
     std::cout << "STACK"<< std::endl;
     std::cout << "---------"<< std::endl;
