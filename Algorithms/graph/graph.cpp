@@ -1,106 +1,147 @@
 #include <map>
 #include "../lib/assert_lib.h"
 #include "Stack.h"
+#include "graph.h"
 
-using namespace std;
-class graph {
-private:
-    int _max_node_child;
-    map<DataType, Node*> vertex_storage;
-
-public:
-    graph(int max_node_child = 2): _max_node_child(max_node_child) {}
+graph::graph(int max_node_child): _max_node_child(max_node_child) {}
 
 
-    Node* find(DataType* key){
-        auto it = vertex_storage.find(*key);
-        if (it != vertex_storage.end())
-        {
-            return it->second;
-        }
-        return nullptr;
+Node* graph::find(DataType* key){
+    auto it = vertex_storage.find(*key);
+    if (it != vertex_storage.end())
+    {
+        return it->second;
+    }
+    return nullptr;
+}
+
+Node* graph::findNode(DataType* key, bool storeIfNotExist) {
+    auto it = vertex_storage.find(*key);
+    Node* node = nullptr;
+    if (it == vertex_storage.end() && storeIfNotExist)
+    {
+        node = new Node(key);
+        vertex_storage.insert(std::make_pair(*key, node));
+    }
+    else
+    {
+        node = it->second;
+    }
+    return node;
+}
+
+void graph::addEdge(DataType* src, DataType * dst) {
+    ASSERT(src != nullptr);
+    ASSERT(dst != nullptr);
+
+    Node* src_node = findNode(src, true);
+    Node* dst_node = findNode(dst, true);
+
+    src_node->addChild(dst_node);
+}
+
+void graph::DFS_traverse(DataType* src)
+{
+    Node* src_node = findNode(src, false);
+    ASSERT(src_node != nullptr);
+
+    std::cout<<"DFS In progress"<<endl;
+    // reset visited vertices throughout the graph
+    for (auto i = vertex_storage.begin(); i != vertex_storage.end(); i++) {
+        i->second->setVisited(false);
     }
 
-    Node* findNode(DataType* key, bool storeIfNotExist) {
-        auto it = vertex_storage.find(*key);
-        Node* node = nullptr;
-        if (it == vertex_storage.end() && storeIfNotExist)
+    Stack * st = new Stack();
+
+    src_node->setVisited(true);
+    st->push(src_node);
+    bool first_node_print = true;
+    while(!st->isEmpty())
+    {
+        Node* curr = st->pop();
+        if (curr == nullptr) {
+            continue;
+        }
+
+        curr->setVisited(true);
+        if (first_node_print)
         {
-            node = new Node(key);
-            vertex_storage.insert(std::make_pair(*key, node));
+            std::cout<<curr->getData();
+            first_node_print = false;
         }
         else
         {
-            node = it->second;
-        }
-        return node;
-    }
-
-    void addEdge(DataType* src, DataType * dst) {
-        ASSERT(src != nullptr);
-        ASSERT(dst != nullptr);
-
-        Node* src_node = findNode(src, true);
-        Node* dst_node = findNode(dst, true);
-
-        src_node->addChild(dst_node); 
-    }
-
-    void DFS_traverse(DataType* src)
-    {
-        Node* src_node = findNode(src, false);
-        ASSERT(src_node != nullptr);
-
-        std::cout<<"DFS In progress"<<endl;
-        // reset visited vertices throughout the graph
-        for (auto i = vertex_storage.begin(); i != vertex_storage.end(); i++) {
-            i->second->setVisited(false);
+            std::cout<<","<<curr->getData();
         }
 
-        Stack* st = new Stack(10);
-
-        src_node->setVisited(true);
-        st->push(src_node);
-        bool first_node_print = true;
-        while(!st->isEmpty())
+        for (int i = 0; i < curr->getNumberOfChild(); i++)
         {
-            Node* curr = st->pop();
-            if (curr == nullptr) {
-                continue;
-            }
-            
-            curr->setVisited(true);
-            if (first_node_print)
+            int idx = curr->getNumberOfChild() - i - 1;
+            Node* child = curr->childList[idx];
+            if (!child->isVisited())
             {
-                std::cout<<curr->getData();
-                first_node_print = false;
-            }
-            else
-            {
-                std::cout<<","<<curr->getData();
-            }
-            
-            for (int i = 0; i < curr->getNumberOfChild(); i++)
-            {
-                int idx = curr->getNumberOfChild() - i - 1;
-                Node* child = curr->childList[idx];
-                if (!child->isVisited())
-                {
-                    st->push(curr->childList[idx]);
-                }
+                st->push(curr->childList[idx]);
             }
         }
-        std::cout<<endl;
+    }
+    std::cout<<endl;
+    delete st;
+}
+
+void graph::BFS_traverse(DataType* src)
+{
+    Node* src_node = findNode(src, false);
+    ASSERT(src_node != nullptr);
+
+    std::cout<<"BFS In progress"<<endl;
+    // reset visited vertices throughout the graph
+    for (auto i = vertex_storage.begin(); i != vertex_storage.end(); i++) {
+        i->second->setVisited(false);
     }
 
-    ~graph(){
-        std::cout<<"Destroying nodes"<<endl;
-        for (auto i = vertex_storage.begin(); i != vertex_storage.end(); i++) {
-            delete i->second;
+    Queue *q = new Queue();
+
+    src_node->setVisited(true);
+    q->push(src_node);
+    bool first_node_print = true;
+    while(!q->isEmpty())
+    {
+        Node* curr = q->pop();
+        if (curr == nullptr) {
+            continue;
+        }
+
+        if (first_node_print)
+        {
+            std::cout<<curr->getData();
+            first_node_print = false;
+        }
+        else
+        {
+            std::cout<<","<<curr->getData();
+        }
+
+        for (int i = 0; i < curr->getNumberOfChild(); i++)
+        {
+            //int idx = curr->getNumberOfChild() - i - 1;
+            Node* child = curr->childList[i];
+            if (!child->isVisited())
+            {
+                q->push(curr->childList[i]);
+                curr->childList[i]->setVisited(true);
+            }
         }
     }
+    std::cout<<endl;
+    delete q;
+}
 
-};
+graph::~graph(){
+    std::cout<<"Destroying nodes"<<endl;
+    for (auto i = vertex_storage.begin(); i != vertex_storage.end(); i++) {
+        delete i->second;
+    }
+}
 
 
 int main()
@@ -125,8 +166,11 @@ int main()
 
     g.DFS_traverse(&d0);
 
+    g.BFS_traverse(&d0);
+
     g.addEdge(&d4, &d6);
     g.DFS_traverse(&d0);
+    g.BFS_traverse(&d0);
 
     return 0;
 }
