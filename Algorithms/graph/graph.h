@@ -23,9 +23,11 @@ public:
 
     void addEdge(DataType* src, DataType * dst);
 
-    void DFS_traverse(DataType* src);
+    vector<DataType> DFS_traverse(DataType* src);
 
-    void BFS_traverse(DataType* src);
+    vector<DataType> BFS_traverse(DataType* src);
+
+    static void print(vector<DataType> vec);
 };
 
 #endif // QRAPH_H

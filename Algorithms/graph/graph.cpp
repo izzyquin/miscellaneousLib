@@ -5,7 +5,6 @@
 
 graph::graph(int max_node_child): _max_node_child(max_node_child) {}
 
-
 Node* graph::find(DataType* key){
     auto it = vertex_storage.find(*key);
     if (it != vertex_storage.end())
@@ -40,12 +39,12 @@ void graph::addEdge(DataType* src, DataType * dst) {
     src_node->addChild(dst_node);
 }
 
-void graph::DFS_traverse(DataType* src)
+vector<DataType> graph::DFS_traverse(DataType* src)
 {
+	vector<DataType> rc;
     Node* src_node = findNode(src, false);
-    ASSERT(src_node != nullptr);
+    ASSERT_RETURN(src_node != nullptr, rc);
 
-    std::cout<<"DFS In progress"<<endl;
     // reset visited vertices throughout the graph
     for (auto i = vertex_storage.begin(); i != vertex_storage.end(); i++) {
         i->second->setVisited(false);
@@ -55,7 +54,7 @@ void graph::DFS_traverse(DataType* src)
 
     src_node->setVisited(true);
     st->push(src_node);
-    bool first_node_print = true;
+ 
     while(!st->isEmpty())
     {
         Node* curr = st->pop();
@@ -64,15 +63,7 @@ void graph::DFS_traverse(DataType* src)
         }
 
         curr->setVisited(true);
-        if (first_node_print)
-        {
-            std::cout<<curr->getData();
-            first_node_print = false;
-        }
-        else
-        {
-            std::cout<<","<<curr->getData();
-        }
+        rc.push_back(curr->getData());
 
         for (int i = 0; i < curr->getNumberOfChild(); i++)
         {
@@ -84,16 +75,17 @@ void graph::DFS_traverse(DataType* src)
             }
         }
     }
-    std::cout<<endl;
+
     delete st;
+    return rc;
 }
 
-void graph::BFS_traverse(DataType* src)
+vector<DataType> graph::BFS_traverse(DataType* src)
 {
+	vector<DataType> rc;
     Node* src_node = findNode(src, false);
-    ASSERT(src_node != nullptr);
+    ASSERT_RETURN(src_node != nullptr, rc);
 
-    std::cout<<"BFS In progress"<<endl;
     // reset visited vertices throughout the graph
     for (auto i = vertex_storage.begin(); i != vertex_storage.end(); i++) {
         i->second->setVisited(false);
@@ -103,7 +95,7 @@ void graph::BFS_traverse(DataType* src)
 
     src_node->setVisited(true);
     q->push(src_node);
-    bool first_node_print = true;
+
     while(!q->isEmpty())
     {
         Node* curr = q->pop();
@@ -111,15 +103,7 @@ void graph::BFS_traverse(DataType* src)
             continue;
         }
 
-        if (first_node_print)
-        {
-            std::cout<<curr->getData();
-            first_node_print = false;
-        }
-        else
-        {
-            std::cout<<","<<curr->getData();
-        }
+        rc.push_back(curr->getData());
 
         for (int i = 0; i < curr->getNumberOfChild(); i++)
         {
@@ -132,46 +116,24 @@ void graph::BFS_traverse(DataType* src)
             }
         }
     }
-    std::cout<<endl;
     delete q;
+    return rc;
+}
+
+void graph::print(vector<DataType> vec){
+	ASSERT(vec.size() != 0);
+	std::cout<<vec[0];
+	for (auto i = 1; i < vec.size(); i++)
+	{
+		std::cout<<","<<vec[i];
+	}
+	std::cout<<std::endl;
 }
 
 graph::~graph(){
-    std::cout<<"Destroying nodes"<<endl;
     for (auto i = vertex_storage.begin(); i != vertex_storage.end(); i++) {
         delete i->second;
     }
 }
 
-
-int main()
-{
-    graph g;
-    DataType d0(0);
-    DataType d1(1);
-    DataType d2(2);
-    DataType d3(3);
-    DataType d4(4);
-    DataType d5(5);
-    DataType d6(6);
-
-    // Add edges to the graph
-    g.addEdge(&d0, &d1);        
-    g.addEdge(&d0, &d2);
-    g.addEdge(&d1, &d3);
-    g.addEdge(&d1, &d4);
-    g.addEdge(&d2, &d4);
-    g.addEdge(&d3, &d5);
-    g.addEdge(&d4, &d5);
-
-    g.DFS_traverse(&d0);
-
-    g.BFS_traverse(&d0);
-
-    g.addEdge(&d4, &d6);
-    g.DFS_traverse(&d0);
-    g.BFS_traverse(&d0);
-
-    return 0;
-}
 
