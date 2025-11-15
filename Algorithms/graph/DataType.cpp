@@ -21,7 +21,7 @@ bool DataType::operator==(const DataType& d) {
     return (this->data == d.getData());
 }
 
-std::ostream& operator<<(std::ostream& os, const DataType& obj)// Overload the << operator as a friend function
+std::ostream& operator<<(std::ostream& os, const DataType& obj) // Overload the << operator as a friend function
 {
     os << "{";
     os << obj.getData(); // Output the data member of the object

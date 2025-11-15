@@ -1,7 +1,7 @@
-/*  test functions to test the TrieNode methods
+/*  test functions to test the graph methods
 
     You can run the method using the command below:
-        g++ -std=c++14 -o main testTrieNode.cpp TrieNode.cpp -lgtest -lgtest_main -pthread
+        g++ -std=c++14 -o main testGraph.cpp graph.cpp Node.cpp DataType.cpp Stack.cpp Queue.cpp -lgtest -lgtest_main -pthread
 */
 
 #include "graph.h"
